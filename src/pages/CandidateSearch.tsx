@@ -1,42 +1,25 @@
 import React, { useState } from 'react';
-
+import { searchGithub } from "../api/API"
 const CandidateSearch: React.FC = () => {
-  const [candidates, setCandidates] = useState<any[]>([]); // State for storing candidates
-  const [searchTerm, setSearchTerm] = useState<string>(''); // State for the search input
-  const [message, setMessage] = useState<string>(''); // State for displaying messages
-
+  const [candidates, setCandidates] = useState<any[]>([]); // Just using `any[]` for simplicity
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
   const fetchCandidates = async () => {
     if (!searchTerm) {
       setMessage('Please enter a search term');
       return;
     }
-  
-    try {
-      const response = await fetch(`https://api.github.com/search/users?q=${searchTerm}`, {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`, 
-        },
-      });
-  
-      const data = await response.json();
-      console.log('Fetched data:', data);
-  
-      if (!response.ok || !data.items) {
+    searchGithub(searchTerm).then((data: any) => {
+      if (!data) {
         setMessage('No candidates found or invalid response');
         setCandidates([]);
         return;
       }
-  
-      setCandidates(data.items);  // Update candidates
+      setCandidates(data);
       setMessage('Candidates loaded');
-    } catch (err) {
-      console.error('Error fetching candidates:', err);
-      setMessage('An error occurred while fetching candidates.');
-    }
+    });
   };
   
-  
-
   return (
     <div>
       <input
@@ -48,25 +31,23 @@ const CandidateSearch: React.FC = () => {
       <button onClick={fetchCandidates}>Load Candidates</button>
       <p>{message}</p>
       {candidates.length > 0 && (
-        <div>
-          {/* Displaying the first candidate's details */}
-          <h2>{candidates[0].login}</h2>
-          <img
-            src={candidates[0].avatar_url}
-            alt={candidates[0].login}
-            width={50}
-            height={50}
-          />
-          <p>Location: {candidates[0].location || 'N/A'}</p>
-          <p>Email: {candidates[0].email || 'N/A'}</p>
-          <p>Company: {candidates[0].company || 'N/A'}</p>
-          <a href={candidates[0].html_url} target="_blank" rel="noopener noreferrer">
-            View Profile
-          </a>
-        </div>
+        <ul>
+          {candidates.map((candidate: any) => (
+            <li key={candidate.id}>
+              <img
+                src={candidate.avatar_url}
+                alt={candidate.login}
+                width={50}
+                height={50}
+              />
+              <a href={candidate.html_url} target="_blank" rel="noopener noreferrer">
+                {candidate.login}
+              </a>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
 };
-
 export default CandidateSearch;
