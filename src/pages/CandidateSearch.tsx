@@ -12,10 +12,9 @@ const CandidateSearch: React.FC = () => {
     }
   
     try {
-      // Ensure you are using `import.meta.env.VITE_GITHUB_TOKEN` here.
       const response = await fetch(`https://api.github.com/search/users?q=${searchTerm}`, {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`, // Correct usage of `import.meta.env`
+          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`, 
         },
       });
   
