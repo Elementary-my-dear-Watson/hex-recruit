@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { searchGithub } from "../api/API"
+
 const CandidateSearch: React.FC = () => {
   const [candidates, setCandidates] = useState<any[]>([]); // Just using `any[]` for simplicity
   const [searchTerm, setSearchTerm] = useState<string>('');
