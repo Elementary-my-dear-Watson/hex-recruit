@@ -1,53 +1,67 @@
-import React, { useState } from 'react';
-import { searchGithub } from "../api/API"
+import React, { useState, useEffect } from 'react';
+import { searchGithub, searchGithubUser } from "../api/API"
+import CandidateCard from '../components/CandidateCard';
 
 const CandidateSearch: React.FC = () => {
-  const [candidates, setCandidates] = useState<any[]>([]); // Just using `any[]` for simplicity
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
+  const [candidateList, setCandidateList] = useState([])
+  const [candidateIndex, setCandidateIndex] = useState(0)
+  const [currentCandidate, setcurrentCandidate] = useState({})
+
   const fetchCandidates = async () => {
-    if (!searchTerm) {
-      setMessage('Please enter a search term');
-      return;
-    }
-    searchGithub(searchTerm).then((data: any) => {
-      if (!data) {
-        setMessage('No candidates found or invalid response');
-        setCandidates([]);
-        return;
+    let response = await searchGithub()
+    response = response.map((userInformation: any) => {
+      return userInformation.login
+    })
+    setCandidateList(response)
+    await fetchCandidate(response[0])
+  }
+  const fetchCandidate = async (username: string) => {
+    let response = await searchGithubUser(username)
+    // console.log(response);
+    setcurrentCandidate({
+      username: response.login,
+      image: response.avatar_url,
+      location: response.location,
+      email: response.email,
+      company: response.company,
+      bio: response.bio,
+    })
+  }
+
+  useEffect(() => {
+    fetchCandidates()
+  }, [])
+
+  useEffect(() => {
+    if (candidateIndex > 0) {
+      if (candidateList.length >= candidateIndex) {
+        fetchCandidates()
+        setCandidateIndex(0)
+      } else {
+        fetchCandidate(candidateList[candidateIndex])
       }
-      setCandidates(data);
-      setMessage('Candidates loaded');
-    });
-  };
-  
+    }
+  }, [candidateIndex])
+
+  const handleMinusButton = () => {
+    setCandidateIndex(candidateIndex + 1)
+  }
+  const handlePlusButton = () => {
+    setCandidateIndex(candidateIndex + 1)
+  }
+
   return (
     <div>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search GitHub users"
-      />
-      <button onClick={fetchCandidates}>Load Candidates</button>
-      <p>{message}</p>
-      {candidates.length > 0 && (
-        <ul>
-          {candidates.map((candidate: any) => (
-            <li key={candidate.id}>
-              <img
-                src={candidate.avatar_url}
-                alt={candidate.login}
-                width={50}
-                height={50}
-              />
-              <a href={candidate.html_url} target="_blank" rel="noopener noreferrer">
-                {candidate.login}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+      <h1>Candidate Search</h1>
+      <CandidateCard {...currentCandidate} />
+      <div className="row">
+        <div className="col nav">
+          <button className='bg-danger rounded-circle' onClick={handleMinusButton}>-</button>
+        </div>
+        <div className="col nav justify-content-end">
+          <button className='bg-success rounded-circle' onClick={handlePlusButton}>+</button>
+        </div>
+      </div>
     </div>
   );
 };
