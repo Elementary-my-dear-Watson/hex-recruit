@@ -8,7 +8,7 @@ const Nav = () => {
     {page === '/SavedCandidates'?(
       <Link to='/'>Home</Link>
     ):(
-      <Link to='/SavedCandidates'>Saved Candidates</Link>
+      <Link to='/SavedCandidates'>Potential Candidates</Link>
     )}
     </>
   )
