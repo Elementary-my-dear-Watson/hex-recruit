@@ -91,7 +91,7 @@ The application is deployed and accessible at:
 6. **Create a Pull Request**  
 
 ## 👥 Collaborators  
-- **Martha Denzer** (Lead Developer)  
+- **Martha Watson** (Lead Developer)  
 - **Jacob Watson** (Contributor) ([GitHub: JakeStair](https://github.com/JakeStair)) 
 - **Justin Moore** (Contributor)
 
